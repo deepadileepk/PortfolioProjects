@@ -1,0 +1,194 @@
+--Looking at Data side by side - 
+Select *
+from [dbo].[CovidDeaths - CovidDeaths]
+
+select *
+from [dbo].[CovidVaccinations - CovidVaccinations]
+
+Select Location, date, Total_cases, new_cases, total_deaths, population
+from [dbo].[CovidDeaths - CovidDeaths] 
+order by 1,2
+
+--Looking at Total_Cases Vs Total_Deaths
+
+Select Location, date, isnull(Total_cases,0), isnull(population,0), 
+(total_cases * 1.0)/population *100
+from [dbo].[CovidDeaths - CovidDeaths] as cd
+order by 1,2
+
+Select *
+from [dbo].[CovidDeaths - CovidDeaths]  
+where location like '%united%'
+
+
+Select Location, MAX(cast(total_deaths as int)) as totaldeathcount
+from [dbo].[CovidDeaths - CovidDeaths] 
+GROUP by Location
+order by totaldeathcount desc
+
+
+Select Location, Population, Max(total_cases) as HigestInfectionCount, Max((total_cases*1.0/population))*100 as PopulationInfected
+from [dbo].[CovidDeaths - CovidDeaths] 
+Group by Location, Population
+Order by PopulationInfected 
+
+Select Location, population, Max(Total_deaths) as Totaldeathcount
+from [dbo].[CovidDeaths - CovidDeaths] 
+where Location = 'Afghanistan'
+group by Location, population
+
+Select location, Sum(population)
+from [dbo].[CovidDeaths - CovidDeaths] 
+WHERE continent is not null
+Group by [location]
+
+Select Continent, Location, Count(Location)
+from [dbo].[CovidDeaths - CovidDeaths] 
+where continent is  not null
+group by Continent, Location
+order by 1,2
+
+
+Select Continent, LOCATION, SUM(Total_deaths)
+from [dbo].[CovidDeaths - CovidDeaths] 
+where continent is NOT null
+group by Continent, LOCATION
+ORDER BY 1,2
+
+Select Continent, SUM(Total_deaths) as TotalDeaths
+from [dbo].[CovidDeaths - CovidDeaths] 
+where continent is NOT null
+group by Continent
+ORDER BY 1
+
+
+--GLOBAL NUMBERS; FINDING DEATH PERCENTAGE 
+
+SELECT DATE, Sum(NEW_CASES) Newcases
+from [dbo].[CovidDeaths - CovidDeaths]
+where continent is not null
+group by date 
+order by date DESC
+
+SELECT DATE, Sum(new_cases*1.0) Newcases, Sum(new_deaths*1.0) Newdeaths, 
+CASE
+    WHEN sum(new_deaths) = 0 or sum(new_cases) = 0 then 0
+    ELSE Sum(new_deaths*1.0)/Sum(new_cases*1.0)*100
+END DEATHPERCENTAGE
+--Sum(new_deaths*1.0)/Sum(new_cases*1.0)*100 DEATHPERCENTAGE
+from [dbo].[CovidDeaths - CovidDeaths]
+where continent is not null
+group by date 
+order by date DESC
+
+
+--LOOKING AT TOTAL POPULATION VS VACCINATION
+
+Select dea.location, dea.continent, dea.date, dea.population, vac.new_vaccinations, 
+SUM(convert(bigint,vac.new_vaccinations)) over (partition by dea.location order by dea.location, dea.date) as RollingPeopleVaccinated
+From [dbo].[CovidDeaths - CovidDeaths] Dea
+Join [dbo].[CovidVaccinations - CovidVaccinations] vac
+on dea.location = vac.location
+and dea.date = vac.date
+where dea.continent is not NULL
+order by 2,3
+
+
+--
+
+Select dea.location, dea.continent, dea.date, dea.population, vac.new_vaccinations,SUM(convert(bigint,vac.new_vaccinations))
+From [dbo].[CovidDeaths - CovidDeaths] Dea
+Join [dbo].[CovidVaccinations - CovidVaccinations] vac
+on dea.location = vac.location
+and dea.date = vac.date
+WHERE dea.continent is not null
+group by dea.Location, dea.continent, dea.date,dea.population, vac.new_vaccinations
+
+
+--LOOKING AT CANADA; ABLE TO USE MULTIPLE WHERE STATEMENTS
+
+Select dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations
+From [dbo].[CovidDeaths - CovidDeaths] Dea
+Join [dbo].[CovidVaccinations - CovidVaccinations] vac
+on dea.location = vac.location
+and dea.date = vac.date
+WHERE dea.continent is not null
+AND dea.[location] = 'Canada'
+group by dea.Location, dea.continent, dea.date, dea.population, vac.new_vaccinations
+order by 1,2 desc
+
+
+--USE CTE
+
+WITH POPVsVAC (continent, location, date, population, new_vaccinations, RollingPeopleVaccinated)
+as
+(
+    Select dea.location, dea.continent, dea.date, dea.population, vac.new_vaccinations, 
+SUM(convert(bigint,vac.new_vaccinations)) over (partition by dea.location order by dea.location, dea.date) as RollingPeopleVaccinated
+From [dbo].[CovidDeaths - CovidDeaths] Dea
+Join [dbo].[CovidVaccinations - CovidVaccinations] vac
+on dea.location = vac.location
+and dea.date = vac.date
+where dea.continent is not NULL
+)
+
+Select *, ((RollingPeopleVaccinated *1.0/ population*1.0) * 100) 
+from POPVsVAC
+
+
+--USE TEMP TABLE
+
+
+Drop table if exists #PercentPopulationVaccinated
+Create Table #PercentPopulationVaccinated
+(
+    Continent NVARCHAR(255),
+    Location NVARCHAR(255),
+    Date datetime,
+    Population NUMERIC,
+    New_vaccinations NUMERIC,
+    RollingPeopleVaccinated NUMERIC
+)
+INSERT into #PercentPopulationVaccinated
+Select dea.location, dea.continent, dea.date, dea.population, vac.new_vaccinations, 
+SUM(convert(bigint,vac.new_vaccinations)) over (partition by dea.location order by dea.location, dea.date) as RollingPeopleVaccinated
+From [dbo].[CovidDeaths - CovidDeaths] Dea
+Join [dbo].[CovidVaccinations - CovidVaccinations] vac
+on dea.location = vac.location
+and dea.date = vac.date
+where dea.continent is not NULL
+
+Select *, ((RollingPeopleVaccinated *1.0/ population*1.0) * 100) 
+from #PercentPopulationVaccinated
+
+
+--CREATING VIEW TO STORE DATA FOR LATER VISUALISATIONS
+
+--Total Population Vs. Vaccination
+
+Create View TOTALPOPULATIONVSVACCINATION as
+Select dea.location, dea.continent, dea.date, dea.population, vac.new_vaccinations, 
+SUM(convert(bigint,vac.new_vaccinations)) over (partition by dea.location order by dea.location, dea.date) as RollingPeopleVaccinated
+From [dbo].[CovidDeaths - CovidDeaths] Dea
+Join [dbo].[CovidVaccinations - CovidVaccinations] vac
+on dea.location = vac.location
+and dea.date = vac.date
+where dea.continent is not NULL
+
+--Percent Population Vaccinated
+
+Create view PercentPopulationVaccinated as 
+Select dea.location, dea.continent, dea.date, dea.population, vac.new_vaccinations, 
+SUM(convert(bigint,vac.new_vaccinations)) over (partition by dea.location order by dea.location, dea.date) as RollingPeopleVaccinated
+From [dbo].[CovidDeaths - CovidDeaths] Dea
+Join [dbo].[CovidVaccinations - CovidVaccinations] vac
+on dea.location = vac.location
+and dea.date = vac.date
+where dea.continent is not NULL
+
+
+Select *
+from PercentPopulationVaccinated
+
+--End of Project
+
