@@ -19,3 +19,7 @@ Dataset used for this project was downloaded from https://www.kaggle.com/dataset
 In this data cleaning project, I utilized SQL to preprocess and clean a housing dataset -identified and handled missing values, ensuring data integrity and accuracy. Through data profiling and validation using SQL queries, I resolved inconsistencies and discrepancies in the data.
 
 The tool that accompanied this research was AZURE DATA STUDIO and AZURE SQL Server Database.
+
+*** Fortune 500 Analysis**
+
+Dataset used for this analysis included a fictious dataset, at the onset I explored different columns to understand industry wise, company wise, revenue wise, tenure wise and group them by the above mentioned categories.  
