@@ -20,6 +20,6 @@ In this data cleaning project, I utilized SQL to preprocess and clean a housing 
 
 The tool that accompanied this research was AZURE DATA STUDIO and AZURE SQL Server Database.
 
-*** Fortune 500 Analysis**
+Fortune 500 Analysis
 
 Dataset used for this analysis included a fictious dataset, at the onset I explored different columns to understand industry wise, company wise, revenue wise, tenure wise and group them by the above mentioned categories.  
