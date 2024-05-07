@@ -37,7 +37,6 @@ LIMIT 1
 ;
 
 -- What is the total revenue for each product sold in January?
-
 SELECT Product
 , price
 , ROUND(SUM(Quantity) * Price,2) AS Revenue
@@ -56,6 +55,7 @@ FROM FebSales
 WHERE location = '548 Lincoln St, Seattle, WA 98101'
 GROUP BY Product
 ;
+
 --How many customers ordered more than 2 products at a time in February, 
 -- what was the average amount spent for those customers?
 SELECT COUNT (DISTINCT acctnum), AVG(Quantity *price)
@@ -66,5 +66,13 @@ WHERE Quantity >  2
 AND QUANTITY <> 'Quantity Ordered'
 ;
 
-
+--List all the products sold in Los Angeles in February, 
+--and include how many of each were sold.
+SELECT Product
+, SUM(Quantity) as total_quantity_in_units
+From FebSales
+WHERE location like '%Los Angeles%'
+GROUP BY Product
+Order by total_quantity_in_units DESC
+;
 
