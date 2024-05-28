@@ -1,4 +1,13 @@
 --ANALYSIS
+***
+1. Conducted comprehensive SQL analysis on Chinook database, extracting key insights about employee 
+reporting structures, customer demographics, and sales agent performance.
+2. Developed complex queries to analyze and visualize data, including join operations, 
+aggregation functions, and subqueries, to uncover trends and patterns in customer behavior and sales performance.
+3. Generated actionable business insights from data, such as identifying top-performing sales agents and understanding 
+ international customer segments, to support strategic decision-making.
+****
+
 --Details on the employees Table
 SELECT *
 FROM chinook.employees
