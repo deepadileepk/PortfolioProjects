@@ -1,4 +1,18 @@
+
+
 --Analysis
+1. Implemented SQL queries for sales analysis, including determining the number of orders and iPhone sales in January, 
+identifying the cheapest product, and calculating total revenue per product for January.
+
+2. Utilized SQL JOINs to extract customer account numbers for February orders, determine product sales and revenue at specific locations, 
+and analyze customer spending behavior in February.
+
+3. Performed data aggregation to find product sales in Los Angeles and New York, headphone sales in February, 
+and average spending per account for February orders.
+
+4. Conducted revenue analysis to identify the highest revenue-generating product in January and
+determine the average amount spent per account in February.
+
 --How many orders were placed in January?
 SELECT COUNT (orderID)
 FROM JanSales
