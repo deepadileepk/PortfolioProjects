@@ -161,3 +161,17 @@ ON i.CustomerId = c.CustomerId
 Group BY Sales_Agent
 ORDER BY Total_Sales DESC
 ;
+
+-- The track that did really well!
+SELECT al.AlbumId, al.Title, ROUND(SUM(Total),2) as total_revenue
+FROM chinook.albums al
+INNER JOIN chinook.tracks tr
+ON al.albumId = tr.AlbumId
+
+INNER JOIN chinook.invoice_items it
+ON it.TrackId = tr.TrackId
+
+INNER JOIN  chinook.invoices i
+ON i.Invoiceid = it.Invoiceid
+GROUP BY al.AlbumId, al.Title
+ORDER BY total_revenue DESC
